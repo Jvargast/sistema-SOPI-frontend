@@ -22,12 +22,12 @@ export default function PrivateRoute({ children }) {
                 } else {
 
                     const res = await (await axios.post(`${process.env.API_BASE}/api/v1/auth/verify`)).status == 200;
-                    setIsAuthenticated(true)
+                    setIsAuthenticated(res)
                     if (!res) navigate('/login')
                 }
             } catch (e) {
-                setIsAuthenticated(true);
-                // navigate('/login')
+                setIsAuthenticated(false);
+                navigate('/login')
             }
         }
         verify()
