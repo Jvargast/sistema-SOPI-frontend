@@ -6,8 +6,11 @@ export const loginUser = ({username, password}) => async(dispatch) => {
         dispatch({type: "LOGIN_REQUEST"});
         /* const config = {headers: {"Content-Type": "application/json"}}; */
         const {data} = await restService.post('/api/v1/auth/ingresar', {username, password});
-
+        
         dispatch({type: "LOGIN_SUCCESS", payload: data.data});
+
+        const res = await restService.get('/api/v1/auth/usuarios/permisos');
+        dispatch({type: "USER_PERMISSIONS", payload: res.data.data})
     } catch (error) {
         dispatch({type: "LOGIN_FAILED", payload: error.response.data.message});
     }

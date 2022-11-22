@@ -16,8 +16,9 @@ export default function PrivateRoute({ children }) {
         const verify = async () => {
             try {
                 
-                if (user) {
+                if (user.isAuthenticated) {
                     setIsAuthenticated(true);
+                    console.log(user)
 
                 } else {
 
