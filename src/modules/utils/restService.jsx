@@ -2,7 +2,7 @@ import axios from "axios"
 
 const post = async (url, body) => {
 
-    return await axios.post(`http://localhost:8000${url}`, body, {withCredentials: true});
+    return await axios.post(`http://localhost:8000${url}`, body, {withCredentials: true, headers: {"Content-Type": "application/json"}});
 }
 const get = async (url) => {
 

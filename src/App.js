@@ -18,9 +18,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />}></Route>
           <Route element={<Layout/>}>
-
             <Route path="/sopis" element={<PrivateRoute />}>
-
               <Route path="" element={<SopiList />}></Route>
               <Route path="nueva" element={<SopiNew />}></Route>
               <Route path=":sopiId" element={<SopiList />}></Route>

@@ -8,7 +8,7 @@ export default function PrivateRoute({ children }) {
 
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const navigate = useNavigate();
-    const user = useSelector(state => state.authReducer.user);
+    const user = useSelector(state => state.authReducer);
 
 
     
