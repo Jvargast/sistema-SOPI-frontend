@@ -35,7 +35,7 @@ export default function Login() {
     e.preventDefault();
 
     dispatch(loginUser({ username: form.username, password: form.password }));
-    navigate("/home")
+    navigate('/home');
   };
 
   
