@@ -40,8 +40,13 @@ export default function PurchaseEdit() {
 
     const { purchaseId } = useParams();
 
-    const editPurchase = () => {
-        console.log(purchase)
+    const editPurchase = async () => {
+
+        const { purchaseTypeId, purchaseId: id, statusId} = purchase;
+        console.log({ purchaseTypeId, purchaseId, statusId})
+
+        const res = await restService.put('/api/v1/compras', { purchaseTypeId, purchaseId, statusId} );
+        console.log(res.data)
     }
 
     useEffect(() => {
@@ -57,6 +62,14 @@ export default function PurchaseEdit() {
                         purchaseTypeId: res.data.data.find(pt => pt.id == purchase.purchaseTypeId).id
                     })
                 })
+            } else {
+                setPurchase(prev => {
+                    return ({
+                        ...prev,
+                        purchaseTypeId: res.data.data[0].id
+                    })
+                })
+
             }
         }
 
