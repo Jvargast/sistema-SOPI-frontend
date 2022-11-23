@@ -7,7 +7,7 @@ export default function DocItem({ findFile, name, type, docId, handleDelete }) {
     return (
 
 
-        <div className='relative flex flex-col items-center w-[200px] h-[200px]'>
+        <div className='relative flex flex-col items-center w-[200px] h-[200px] m-10'>
             <div className='cursor-pointer' onClick={() => findFile(docId) }>
 
             <img className='-z-10  object-cover' src={item} />

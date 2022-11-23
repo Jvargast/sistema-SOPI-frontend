@@ -1,15 +1,42 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Button from '../common/Button'
+import PageContentWrapper from '../common/PageContentWrapper'
+import Title from '../common/Title'
+import { useOpenMessage } from '../common/UserMessage'
 import restService from '../utils/restService'
 import DocItem from './DocItem'
 
 export default function DocList() {
 
     const { purchaseId } = useParams()
+    const navigate = useNavigate()
 
     const [docs, setDocs] = useState([])
     const [file, setFile] = useState(null);
+
+    const openMessage = useOpenMessage()
+
+    useEffect(() => {
+        const searchPurchase =  async () => {
+            try {
+                const res = await restService.get(`/api/v1/compras/${purchaseId}`)
+
+                if (res.status == 200) {
+                } else {
+                    openMessage('Error al consultar compra', false);
+                    navigate('/compras')
+                    
+                }
+            } catch (e) {
+                openMessage('Error al consultar compra', false);
+                navigate('/compras')
+
+    
+            }
+        }
+        searchPurchase();
+    },[])
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0])
@@ -35,6 +62,7 @@ export default function DocList() {
             'Content-Type': 'multipart/form-data'
         }
         )
+        setFile(null)
         console.log(res)
     }
 
@@ -59,36 +87,43 @@ export default function DocList() {
             setDocs(res.data.data)
         }
         searchDocs()
-    }, [])
+    }, [file])
     return (
         <div className='m-10'>
 
 
-            <input onChange={handleFileChange} id='input-file' hidden type={'file'} />
-            {
-                file ? (
-                    <div className='mt-4'>
-                        <label className='mr-8'>{file.name}</label>
-                        <Button className={'mr-6'} onClick={sendFile}>Enviar Documento</Button>
-                        <Button onClick={() => setFile(null)}>Cambiar Documento</Button>
-                    </div>
-                ) : (
-                    <label className='text-white px-3 py-2 rounded bg-[#F3931D] cursor-pointer' for='input-file'>Agregar Documento</label>
-                )
-            }
 
-            <div className='my-8 flex justify-center'>
+            <Title title={'Documentos'} />
+            <PageContentWrapper>
 
+
+
+                <input onChange={handleFileChange} id='input-file' hidden type={'file'} />
                 {
-                    docs.map((d) => {
-                        return (
-                            <DocItem findFile={findFile} handleDelete={deleteDoc} docId={d.id} name={d.name} type={d.type} />
-
-                        )
-                    })
+                    file ? (
+                        <div className='mt-4'>
+                            <label className='mr-8'>{file.name}</label>
+                            <Button className={'mr-6'} onClick={sendFile}>Enviar Documento</Button>
+                            <Button onClick={() => setFile(null)}>Cambiar Documento</Button>
+                        </div>
+                    ) : (
+                        <label className='text-white px-3 py-2 rounded bg-[#F3931D] cursor-pointer' for='input-file'>Agregar Documento</label>
+                    )
                 }
 
-            </div>
+                <div className='my-8 flex justify-center'>
+
+                    {
+                        docs.map((d) => {
+                            return (
+                                <DocItem findFile={findFile} handleDelete={deleteDoc} docId={d.id} name={d.name} type={d.type} />
+
+                            )
+                        })
+                    }
+
+                </div>
+            </PageContentWrapper >
         </div>
     )
 }

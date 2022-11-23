@@ -1,24 +1,19 @@
 import { useFormik } from 'formik'
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import addmanager from "../../assets/addmanager.svg";
 import Button from '../common/Button';
 import FieldGroup from '../common/FieldGroup';
 import FormField from '../common/FormField';
 import SelectInput from '../common/SelectInput';
+import Title from '../common/Title';
+import { useOpenMessage } from '../common/UserMessage';
 import restService from '../utils/restService';
 
 export default function PurchaseEdit() {
 
-    const purchaseForm = useFormik({
-        initialValues: {
-            purchaseId: 0,
-            purchaseTypeId: 0,
-            supplierId: 0,
-            totalAmmount: 0,
-            statusId: 0
 
-        }
-    });
+    const openMessage = useOpenMessage();
 
     const navigate = useNavigate()
 
@@ -41,15 +36,25 @@ export default function PurchaseEdit() {
     const { purchaseId } = useParams();
 
     const editPurchase = async () => {
+        try {
+            const { purchaseTypeId, purchaseId: id, statusId, totalAmmount } = purchase;
+            const res = await restService.put('/api/v1/compras', { purchaseTypeId, purchaseId, statusId, totalAmmount });
+            if (res.status == 200) {
+                openMessage('Compra actualizada con éxito', true);
 
-        const { purchaseTypeId, purchaseId: id, statusId} = purchase;
-        console.log({ purchaseTypeId, purchaseId, statusId})
+            } else {
 
-        const res = await restService.put('/api/v1/compras', { purchaseTypeId, purchaseId, statusId} );
-        console.log(res.data)
+                openMessage('Error el actualizar compra', false);
+            }
+        } catch (e) {
+            openMessage('Error el actualizar compra', false);
+        }
     }
 
     useEffect(() => {
+
+
+        
         const searchPurchasesType = async (purchase) => {
             const res = await restService.get('/api/v1/compras/tipos');
             setPurchaseTypes(res.data.data)
@@ -103,12 +108,17 @@ export default function PurchaseEdit() {
         }
 
         const searchPurchase = async () => {
-            const res = await restService.get(`/api/v1/compras/${purchaseId}`);
-            setPurchase(res.data.data)
-            console.log('Purchase', res.data.data);
-            searchPurchasesType(res.data.data);
-            searchSuppliers(res.data.data);
-            searchStatuses(res.data.data);
+            try {
+                const res = await restService.get(`/api/v1/compras/${purchaseId}`);
+                setPurchase(res.data.data)
+                console.log('Purchase', res.data.data);
+                searchPurchasesType(res.data.data);
+                searchSuppliers(res.data.data);
+                searchStatuses(res.data.data);
+
+            } catch (e) {
+                navigate('/compras')
+            }
 
         }
 
@@ -117,7 +127,13 @@ export default function PurchaseEdit() {
 
     return (
         <div className='m-10'>
-            <h1 className='text-xl'>Información de compra</h1>
+            <Title title={'Información de compra'} />
+            <div className='flex justify-end mt-4'>
+
+                <Link to={`/compras/${purchaseId}/gestores/añadir`}>
+                    <img src={addmanager} />
+                </Link>
+            </div>
             <FieldGroup>
                 <SelectInput
                     label={'Tipo de compra'}
@@ -183,9 +199,11 @@ export default function PurchaseEdit() {
                 </div>
             </FieldGroup>
 
-            <div className='flex'>
-                <Button onClick={editPurchase}>Guardar</Button>
-                <div className='mr-6'><Button onClick={() => {navigate(`/compras/documentos/${purchase.id}`)}}>Ver Documentos</Button></div>
+            <div className='flex justify-center flex-wrap'>
+                <Button className={'mr-6 my-6'} onClick={editPurchase}>Guardar</Button>
+                <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/documentos/${purchase.id}`) }}>Ver Documentos</Button>
+                <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/tickets/${purchase.id}`) }}>Ver Tickets</Button>
+                <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/tickets/crear`) }}>Crear Ticket</Button>
 
             </div>
         </div>

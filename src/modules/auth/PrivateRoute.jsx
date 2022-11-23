@@ -11,29 +11,32 @@ export default function PrivateRoute({ children }) {
     const user = useSelector(state => state.authReducer);
 
 
-    
+
     useEffect(() => {
         const verify = async () => {
-            try {
-                
-                if (user.isAuthenticated) {
-                    setIsAuthenticated(true);
-                    console.log(user)
+            if (!user.loading) {
 
-                } else {
+                try {
 
-                    const res = await (await axios.post(`${process.env.API_BASE}/api/v1/auth/verify`)).status == 200;
-                    setIsAuthenticated(res)
-                    if (!res) navigate('/login')
+                    if (user.isAuthenticated) {
+                        setIsAuthenticated(true);
+                        console.log(user)
+
+                    } else {
+
+                        const res = await (await axios.post(`${process.env.API_BASE}/api/v1/auth/verify`)).status == 200;
+                        setIsAuthenticated(res)
+                        if (!res) navigate('/login')
+                    }
+                } catch (e) {
+                    setIsAuthenticated(false);
+                    navigate('/login')
                 }
-            } catch (e) {
-                setIsAuthenticated(false);
-                navigate('/login')
             }
         }
         verify()
         console.log('Private route')
-    }, []);
+    }, [user.loading]);
 
     if (isAuthenticated == null) {
         return (<>Cargando ...</>)

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Button from '../common/Button';
+import FieldGroup from '../common/FieldGroup';
+import SelectInput from '../common/SelectInput';
+import Title from '../common/Title';
 import restService from '../utils/restService';
 
 export default function SopiNew() {
@@ -39,7 +42,7 @@ export default function SopiNew() {
             return ({ supplyId: supply.id, quantity: supply.quantity })
         })
 
-        console.log({ ...mainForm, items: addedSupplies })
+        console.log({ ...mainForm, items: parsedSupplies })
         const body = { ...mainForm, items: parsedSupplies };
 
         try {
@@ -98,38 +101,29 @@ export default function SopiNew() {
 
     return (
         <div className='m-10'>
-            <h1 className='text-xl'>
-
-                Nueva Solicitud
-            </h1>
+            <Title title={'Nueva Solicitud'} />
             <div className='flex flex-col w-full'>
-                <div className='w-full flex justify-around my-10'>
-                    <div className='flex flex-col'>
-                        <label className='mb-4'>Centro de costo</label>
-                        <select name={'costCenterId'} onChange={handleChange} className='rounded p-2 drop-shadow-md'>
-                            {
-                                costCenter.map((c) => {
-                                    return (
+                <FieldGroup>
 
-                                        <option value={c.id}>{c.name}</option>
-                                    )
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className='flex flex-col'>
-                        <label className='mb-4'>Financiamiento</label>
-                        <select name={'financingId'} onChange={handleChange} className='rounded p-2 drop-shadow-md'>
-                            {
-                                financing.map((c) => {
-                                    return (
-                                        <option value={c.id}>{c.name}</option>
-                                    )
-                                })
-                            }
-                        </select>
-                    </div>
-                </div>
+                    <SelectInput
+                        disabled={false}
+                        value={mainForm.costCenterId}
+                        name={'costCenterId'}
+                        label={'Centro de costo'}
+                        onChange={handleChange}
+                        options={costCenter}
+                    />
+                    <SelectInput
+                        disabled={false}
+                        value={mainForm.financingId}
+                        name={'financingId'}
+                        label={'Financiamiento'}
+                        onChange={handleChange}
+                        options={financing}
+                    />
+
+                </FieldGroup>
+              
                 <div className='flex flex-col w-full'>
 
                     <div className='flex flex-col'>

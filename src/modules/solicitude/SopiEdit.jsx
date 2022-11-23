@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../common/Button';
+import FieldGroup from '../common/FieldGroup';
+import PageContentWrapper from '../common/PageContentWrapper';
+import SelectInput from '../common/SelectInput';
+import Title from '../common/Title';
 import restService from '../utils/restService';
 
 export default function SopiEdit() {
@@ -16,15 +20,21 @@ export default function SopiEdit() {
 
     });
 
+    const navigate = useNavigate();
+
     const findPermission = (permission) => {
         return user.permissions.find(p => p.name == permission) != null;
 
     }
 
+    const user = useSelector(state => state.authReducer);
     const createPurchase = async () => {
         try {
             const res = await restService.post('/api/v1/compras', { sopiId: sopi.sopiId, creationType: 'SOPI_COMPLETA' });
             console.log(res)
+            if (res.status == 200) {
+                navigate('/compras')
+            }
 
         } catch (e) {
             console.log(e)
@@ -35,7 +45,6 @@ export default function SopiEdit() {
 
     const { sopiId } = useParams();
 
-    const user = useSelector(state => state.authReducer);
 
 
     const [costCenter, setCostCenter] = useState([]);
@@ -70,29 +79,16 @@ export default function SopiEdit() {
 
         try {
             const res = await restService.put('/api/v1/sopi', sopi);
-            console.log(res)
 
         } catch (e) {
-            console.log(e)
         }
     }
-
-
-    useEffect(() => {
-
-        console.log('USer', user)
-
-    }, [user])
 
     useEffect(() => {
         const searchStatuses = async (sopi) => {
             const res = await restService.get('/api/v1/sopi/estados');
             if (res.status == 200) {
                 setStatuses(res.data.data);
-
-
-
-
             }
         }
         const searchCC = async (sopi) => {
@@ -114,13 +110,6 @@ export default function SopiEdit() {
 
         const loadData = async () => {
             const res = await restService.get(`/api/v1/sopi/${sopiId}`)
-            console.log('laskdjalksdjalksjdlk', {
-                statusId: res.data.data.sopi.status.id,
-                costCenterId: res.data.data.sopi.costCenterId,
-                financingId: res.data.data.sopi.financingId,
-                basis: res.data.data.sopi.basis,
-                details: res.data.data.details.map(d => { return { quantity: d.quantity, name: d.supply.name } }),
-            })
             setSopi({
 
                 sopiId: res.data.data.sopi.id,
@@ -138,68 +127,49 @@ export default function SopiEdit() {
 
         loadData();
     }, []);
+
     return (
         <div className='m-10'>
-            <h1 className='text-xl'>
+            <Title title={'Información solicitud'} />
+            <PageContentWrapper>
 
-                Información Solicitud
-            </h1>
-            <div className='flex flex-col w-full'>
-                <div className='w-full flex justify-around my-10'>
-                    <div className='flex flex-col'>
-                        <label className='mb-4'>Centro de costo</label>
-                        <select disabled={!findPermission('SOPI_EDITAR')} name={'costCenterId'} value={sopi.costCenterId} onChange={handleChange} className='rounded p-2 drop-shadow-md'>
-                            {
-                                costCenter.map((c) => {
-                                    console.log(typeof c.id)
-                                    return (
+                <FieldGroup>
 
-                                        <option value={c.id}>{c.name}</option>
-                                    )
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className='flex flex-col'>
-                        <label className='mb-4'>Financiamiento</label>
-                        <select disabled={!findPermission('SOPI_EDITAR')} name={'financingId'} value={sopi.financingId} onChange={handleChange} className='rounded p-2 drop-shadow-md'>
-                            {
-                                financing.map((c) => {
-                                    return (
-                                        <option value={c.id}>{c.name}</option>
-                                    )
-                                })
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div className='flex flex-col w-full'>
+                    <SelectInput
+                        disabled={!findPermission('SOPI_EDITAR')}
+                        value={sopi.costCenterId}
+                        name={'costCenterId'}
+                        label={'Centro de costo'}
+                        onChange={handleChange}
+                        options={costCenter}
+                    />
+                    <SelectInput
+                        disabled={!findPermission('SOPI_EDITAR')}
+                        value={sopi.financingId}
+                        name={'financingId'}
+                        label={'Financiamiento'}
+                        onChange={handleChange}
+                        options={financing}
+                    />
 
-                    <div className='flex flex-col'>
-                        <label className='mb-4'>Estado</label>
-                        <select disabled={!findPermission('SOPI_EDITAR')} name='statusId' value={sopi.statusId}
-                            className='rounded p-2 drop-shadow-md w-full'
-                            onChange={handleChange}
-                        >
-                            {
+                </FieldGroup>
 
-                                statuses.map((status) => {
-                                    return (
-                                        <option value={status.id}>{status.name}</option>
-                                    )
-                                })
-                            }
-                        </select>
+                <FieldGroup>
+                    <SelectInput
+                        label={'Estado'}
+                        disabled={!findPermission('SOPI_EDITAR')}
+                        onChange={handleChange}
+                        value={sopi.statusId}
+                        name={'statusId'}
+                        options={statuses}
+                    />
 
-                    </div>
-                </div>
-                <div className='flex flex-col mt-4 w-full'>
-
-                    <div className='flex flex-col'>
+                    <div className='flex flex-col  w-[50%]'>
                         <label className='mb-4'>Fundamento</label>
                         <textarea disabled name={'basis'} value={sopi.basis} onChange={handleChange} className='rounded p-2 drop-shadow-md'></textarea>
                     </div>
-                </div>
+                </FieldGroup>
+
                 <div className='flex flex-col w-full my-6'>
 
                     <div className='flex flex-col max-w-[400px]'>
@@ -219,7 +189,7 @@ export default function SopiEdit() {
                                                 <tr>
                                                     <td className='px-3 py-2'>{s.name}</td>
                                                     <td className='px-3 py-2'>{s.quantity}</td>
-                                                    {/* <td className='px-3 py-2'><input className='w-full px-3 py-2' value={s.quantity} onChange={(e) => { changeSupplyQuantity(s.id, e.target.value) }} /></td> */}
+
                                                 </tr>
                                             )
                                         })
@@ -244,8 +214,9 @@ export default function SopiEdit() {
 
                     }
                 </div>
-            </div>
 
+
+            </PageContentWrapper>
 
         </div>
     )
