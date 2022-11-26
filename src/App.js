@@ -18,6 +18,8 @@ import PurchaseList from "./modules/purchases/PurchaseList";
 import SopiEdit from "./modules/solicitude/SopiEdit";
 import SopiList from "./modules/solicitude/SopiList";
 import SopiNew from "./modules/solicitude/SopiNew";
+import UserProfile from "./modules/auth/UserProfile";
+import UserList from "./modules/auth/UserList";
 
 function App() {
 
@@ -53,6 +55,11 @@ function App() {
               <Route path="" element={<TicketList/>}/>
               <Route path=":ticketId" element={<TicketDetail/>}/>
 
+            </Route>
+            <Route path="/usuarios">
+              <Route path="perfil/:userId" element={<UserProfile/>}/>
+              <Route path="perfil" element={<UserProfile/>}/>
+              <Route path="" element={<UserList/>}/>
             </Route>
             <Route path="*" element={<Home />}></Route>
           </Route>

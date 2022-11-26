@@ -58,7 +58,7 @@ export default function TicketList() {
                
     
                 
-                <Pagination visible={tickets.length > 0} setData={setTickets} baseUrl={'/api/v1/gestion/ticket'} perPage={50} />
+                <Pagination visible={tickets.length > 0} setData={setTickets} baseUrl={'/api/v1/gestion/ticket'} perPage={3} />
 
             </PageContentWrapper>
 
