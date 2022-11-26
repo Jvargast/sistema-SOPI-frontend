@@ -31,6 +31,7 @@ export default function DocList() {
             } catch (e) {
                 openMessage('Error al consultar compra', false);
                 navigate('/compras')
+                
 
     
             }
@@ -82,9 +83,15 @@ export default function DocList() {
 
     useEffect(() => {
         const searchDocs = async () => {
-            const res = await restService.get(`/api/v1/gestion/documentos?compraId=${purchaseId}`)
-            console.log(res.data.data)
-            setDocs(res.data.data)
+            try {
+                const res = await restService.get(`/api/v1/gestion/documentos?compraId=${purchaseId}`)
+                console.log(res.data.data)
+                setDocs(res.data.data)
+
+            } catch (e) {
+                openMessage('No puedes ver los documentos', false);
+                navigate('/compras')
+            }
         }
         searchDocs()
     }, [file])

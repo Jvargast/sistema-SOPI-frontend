@@ -38,7 +38,7 @@ export default function UserMessage() {
     return (
         <>
             {
-                messageContext.open ? <div className={`fixed z-[999] w-full text-white font-bold flex items-center shadow bg-[#fff]  py-2 px-2 rounded min-w-[300px] min-h-[50px] ${messageContext.success ?
+                messageContext.open ? <div className={`fixed z-[999] w-full text-white font-bold flex items-center shadow bg-[#fff]  py-2 px-2  min-w-[300px] min-h-[50px] ${messageContext.success ?
                     'bg-[#4BB543]' : 'bg-[#FC100D]'
                 }`}>{messageContext.message}</div> : ''
             }

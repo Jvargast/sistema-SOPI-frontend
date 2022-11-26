@@ -1,4 +1,5 @@
 import { useFormik } from 'formik'
+import SuppliesTable from "../solicitude/SuppliesTable";
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import addmanager from "../../assets/addmanager.svg";
@@ -9,11 +10,14 @@ import SelectInput from '../common/SelectInput';
 import Title from '../common/Title';
 import { useOpenMessage } from '../common/UserMessage';
 import restService from '../utils/restService';
+import { useSelector } from 'react-redux';
 
 export default function PurchaseEdit() {
 
 
     const openMessage = useOpenMessage();
+
+    const user = useSelector(store => store.authReducer)
 
     const navigate = useNavigate()
 
@@ -54,7 +58,7 @@ export default function PurchaseEdit() {
     useEffect(() => {
 
 
-        
+
         const searchPurchasesType = async (purchase) => {
             const res = await restService.get('/api/v1/compras/tipos');
             setPurchaseTypes(res.data.data)
@@ -117,6 +121,8 @@ export default function PurchaseEdit() {
                 searchStatuses(res.data.data);
 
             } catch (e) {
+
+                openMessage('No puedes ver la compra', false);
                 navigate('/compras')
             }
 
@@ -128,12 +134,20 @@ export default function PurchaseEdit() {
     return (
         <div className='m-10'>
             <Title title={'Información de compra'} />
-            <div className='flex justify-end mt-4'>
+            {
+                user.permissions.find((p) => p.name == 'COMPRA_EDITAR') ? (
 
-                <Link to={`/compras/${purchaseId}/gestores/añadir`}>
-                    <img src={addmanager} />
-                </Link>
-            </div>
+                    <div className='flex justify-end mt-4'>
+
+
+
+                        <Link to={`/compras/${purchaseId}/gestores/añadir`}>
+                            <img src={addmanager} />
+                        </Link>
+                    </div>
+                ) : ''
+
+            }
             <FieldGroup>
                 <SelectInput
                     label={'Tipo de compra'}
@@ -141,6 +155,7 @@ export default function PurchaseEdit() {
                     value={purchase.purchaseTypeId}
                     onChange={handleChange}
                     options={purchaseTypes}
+                    disabled={user.permissions.find((p) => p.name == 'COMPRA_EDITAR') == undefined}
 
                 />
                 <SelectInput
@@ -149,6 +164,7 @@ export default function PurchaseEdit() {
                     value={purchase.supplierId}
                     onChange={handleChange}
                     options={suppliers}
+                    disabled={user.permissions.find((p) => p.name == 'COMPRA_EDITAR') == undefined}
 
                 />
             </FieldGroup>
@@ -160,6 +176,7 @@ export default function PurchaseEdit() {
                     value={purchase.statusId}
                     onChange={handleChange}
                     options={statuses}
+                    disabled={user.permissions.find((p) => p.name == 'COMPRA_EDITAR') == undefined}
 
                 />
                 <FormField
@@ -167,43 +184,38 @@ export default function PurchaseEdit() {
                     name={'totalAmmount'}
                     label={'Costo Total'}
                     onChange={handleChange}
+                    disabled={user.permissions.find((p) => p.name == 'COMPRA_EDITAR') == undefined}
                 />
 
             </FieldGroup>
             <FieldGroup>
                 <div className='flex flex-col max-w-[400px]'>
-                    <label className='mb-4'>Insumos</label>
-
-                    <div className=''>
-                        <table className='drop-shadow-md w-full my-6'>
-                            <thead>
-                                <td>Insumo</td>
-                                <td>Cantidad</td>
-                            </thead>
-                            <tbody>
-
-                                {
-                                    purchase.purchaseDetails.map((s) => {
-                                        return (
-                                            <tr>
-                                                <td className='px-3 py-2'>{s.sopiDetail.supply.name}</td>
-                                                <td className='px-3 py-2'>{s.sopiDetail.quantity}</td>
-                                                {/* <td className='px-3 py-2'><input className='w-full px-3 py-2' value={s.quantity} onChange={(e) => { changeSupplyQuantity(s.id, e.target.value) }} /></td> */}
-                                            </tr>
-                                        )
-                                    })
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                    <SuppliesTable supplies={purchase.purchaseDetails.map(item => {
+                        console.log(item)
+                        return {
+                            name: item.sopiDetail.supply.name,
+                            quantity: item.quantity
+                        }
+                    })} />
+                    {/* <td className='px-3 py-2'>{s.sopiDetail.supply.name}</td>
+                                                <td className='px-3 py-2'>{s.sopiDetail.quantity}</td> */}
                 </div>
             </FieldGroup>
 
             <div className='flex justify-center flex-wrap'>
-                <Button className={'mr-6 my-6'} onClick={editPurchase}>Guardar</Button>
+                {
+                    user.permissions.find((p) => p.name == 'COMPRA_EDITAR') ? (
+                        <Button className={'mr-6 my-6'} onClick={editPurchase}>Guardar</Button>
+
+                    ) : ''
+                }
                 <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/documentos/${purchase.id}`) }}>Ver Documentos</Button>
-                <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/tickets/${purchase.id}`) }}>Ver Tickets</Button>
-                <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/tickets/crear`) }}>Crear Ticket</Button>
+                <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/${purchase.id}/tickets`) }}>Ver Tickets</Button>
+                {
+                    user.permissions.find((p) => p.name == 'TICKET_CREAR') ? (
+                        <Button className={'mr-6 my-6'} onClick={() => { navigate(`/compras/tickets/crear?compraId=${purchase.id}`) }}>Crear Ticket</Button>
+                    ) : ''
+                }
 
             </div>
         </div>

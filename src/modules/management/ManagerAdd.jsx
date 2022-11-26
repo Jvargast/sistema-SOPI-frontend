@@ -4,6 +4,7 @@ import Button from '../common/Button';
 import FieldGroup from '../common/FieldGroup';
 import SelectInput from '../common/SelectInput';
 import Title from '../common/Title';
+import { useOpenMessage } from '../common/UserMessage';
 import restService from '../utils/restService';
 
 export default function ManagerAdd() {
@@ -11,21 +12,28 @@ export default function ManagerAdd() {
     const [managers, setManagers] = useState([]);
     const [selectedManager, setSelectedManager] = useState(0)
 
+    const openMessage = useOpenMessage()
+
     const { purchaseId } = useParams()
 
     useEffect(() => {
         console.log(purchaseId)
         const loadManagers = async () => {
-            const res = await restService.get(`/api/v1/auth/usuarios`)
-            setManagers(res.data.data.map((user) => {
-                return (
-                    {
-                        id: user.id,
-                        name: `${user.firstname} ${user.lastname}  `
-                    }
-                )
-            }))
-            setSelectedManager(res.data.data[0].id)
+            let res= '';
+            try {
+                res = await restService.get(`/api/v1/auth/usuarios`)
+                setManagers(res.data.data.map((user) => {
+                    return (
+                        {
+                            id: user.id,
+                            name: `${user.firstname} ${user.lastname}  `
+                        }
+                    )
+                }))
+                setSelectedManager(res.data.data[0].id)
+            } catch (e) {
+                
+            }
 
         }
 
@@ -33,8 +41,15 @@ export default function ManagerAdd() {
     }, [])
 
     const addManager = async () => {
-        const res = await restService.post(`/api/v1/gestion/responsables`, {managerId: selectedManager, purchaseId})
-        console.log({managerId: selectedManager, purchaseId})
+        let res = ''
+        try {
+            const res = await restService.post(`/api/v1/gestion/responsables`, {managerId: selectedManager, purchaseId})
+            console.log({managerId: selectedManager, purchaseId})
+            openMessage('Responsable añadido con éxito', true);
+        } catch (e) {
+            openMessage(`Error al ingresar responsable ${res.status == 403 ? 'no tienes el acceso necesario' : ''}`, false);
+            
+        }
 
     }
     return (

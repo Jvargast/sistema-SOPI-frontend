@@ -6,7 +6,9 @@ import FieldGroup from '../common/FieldGroup';
 import PageContentWrapper from '../common/PageContentWrapper';
 import SelectInput from '../common/SelectInput';
 import Title from '../common/Title';
+import { useOpenMessage } from '../common/UserMessage';
 import restService from '../utils/restService';
+import SuppliesTable from './SuppliesTable';
 
 export default function SopiEdit() {
 
@@ -19,6 +21,8 @@ export default function SopiEdit() {
         details: []
 
     });
+
+    const openMessage = useOpenMessage()
 
     const navigate = useNavigate();
 
@@ -79,8 +83,17 @@ export default function SopiEdit() {
 
         try {
             const res = await restService.put('/api/v1/sopi', sopi);
+            if (res.status == 200) {
+                openMessage('Solicitud actualizada con éxito', true);
+            } else {
 
+                openMessage('Error al actualizar solicitud', false);
+            }
         } catch (e) {
+
+            openMessage('Error al actualizar solicitud', false);
+
+
         }
     }
 
@@ -170,34 +183,9 @@ export default function SopiEdit() {
                     </div>
                 </FieldGroup>
 
-                <div className='flex flex-col w-full my-6'>
+                <div className='flex w-full my-8 justify-center'>
 
-                    <div className='flex flex-col max-w-[400px]'>
-                        <label className='mb-4'>Insumos</label>
-
-                        <div className=''>
-                            <table className='drop-shadow-md w-full my-6'>
-                                <thead>
-                                    <td>Insumo</td>
-                                    <td>Cantidad</td>
-                                </thead>
-                                <tbody>
-
-                                    {
-                                        sopi.details.map((s) => {
-                                            return (
-                                                <tr>
-                                                    <td className='px-3 py-2'>{s.name}</td>
-                                                    <td className='px-3 py-2'>{s.quantity}</td>
-
-                                                </tr>
-                                            )
-                                        })
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <SuppliesTable supplies={sopi.details} />
                 </div>
                 <div className='flex flex-col w-full my-6'>
 

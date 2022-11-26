@@ -1,7 +1,7 @@
 import React from 'react'
 
-export default function PageContentWrapper({children}) {
+export default function PageContentWrapper({children, className}) {
   return (
-    <div className='py-10'>{children}</div>
+    <div className={`py-10 ${className}`}>{children}</div>
   )
 }

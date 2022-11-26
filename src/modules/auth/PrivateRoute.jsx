@@ -1,32 +1,51 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { logout } from '../../contexts/actions';
 
 
-export default function PrivateRoute({ children }) {
+export default function PrivateRoute({ children, requiredPermission }) {
 
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const navigate = useNavigate();
     const user = useSelector(state => state.authReducer);
 
+    const dispatch = useDispatch();
+
 
 
     useEffect(() => {
         const verify = async () => {
+            try {
+                if ((await axios.post(`http://localhost:8000/api/v1/auth/verify`,{}, { withCredentials: true})).status == 401) {
+                    setIsAuthenticated(false);
+                    dispatch(logout())
+                    navigate('/login')
+                    return;
+                }
+                
+            } catch (e ){
+
+                setIsAuthenticated(false);
+                dispatch(logout())
+                navigate('/login')
+
+            }
             if (!user.loading) {
 
                 try {
 
-                    if (user.isAuthenticated) {
+                    const hasPermission = (requiredPermission ? user.permissions.find(p => p.name == requiredPermission) : true);
+                    if (user.isAuthenticated && hasPermission) {
                         setIsAuthenticated(true);
-                        console.log(user)
 
                     } else {
 
-                        const res = await (await axios.post(`${process.env.API_BASE}/api/v1/auth/verify`)).status == 200;
+                        const res = (await axios.post(`http://localhost:8000/api/v1/auth/verify`,{}, { withCredentials: true})).status == 200;
                         setIsAuthenticated(res)
                         if (!res) navigate('/login')
+                        else if (res && !hasPermission) navigate('/home')
                     }
                 } catch (e) {
                     setIsAuthenticated(false);
@@ -35,7 +54,7 @@ export default function PrivateRoute({ children }) {
             }
         }
         verify()
-        console.log('Private route')
+
     }, [user.loading]);
 
     if (isAuthenticated == null) {
@@ -43,7 +62,7 @@ export default function PrivateRoute({ children }) {
     }
     if (isAuthenticated) {
         return (
-            <Outlet></Outlet> || { children }
+            children || <Outlet></Outlet>   
         )
     }
 }

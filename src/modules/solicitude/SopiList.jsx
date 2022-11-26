@@ -4,16 +4,29 @@ import Button from '../common/Button';
 import restService from '../utils/restService';
 import editButton from "../../assets/edit-button.svg";
 import Title from '../common/Title';
+import { useOpenMessage } from '../common/UserMessage';
 
 export default function SopiList() {
 
     const [sopis, setSopis] = useState([]);
 
+    const openMessage = useOpenMessage()
+
     useEffect(() => {
         const searchSopis = async () => {
-            const res = await restService.get('/api/v1/sopi')
-            console.log(res.data)
-            setSopis(res.data.data)
+            try {
+                const res = await restService.get('/api/v1/sopi')
+                if (res.status == 403 ) {
+                    openMessage('No tienes el acceso necesario para ver las solicitudes', false);
+                    
+                }
+                setSopis(res.data.data)
+                
+            } catch (e) {
+                openMessage('No tienes el acceso necesario para ver las solicitudes', false);
+                navigate('/home')
+
+            }
         }
         searchSopis()
     }, [])

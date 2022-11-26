@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function SelectInput({label,name, value, options, onChange, disabled}) {
+export default function SelectInput({label,name, value, options, onChange, disabled, children}) {
 
     console.log(options)
     return (
@@ -17,6 +17,7 @@ export default function SelectInput({label,name, value, options, onChange, disab
                     })
                 }
             </select>
+            {children}
         </div>
     )
 }

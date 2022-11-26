@@ -16,6 +16,7 @@ export default function NavBar() {
                      hasViewSopiModulePermission ? <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={'/sopis'}>Solicitudes</Link></li> : ''
                 }
                 <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={'/compras'}>Compras</Link></li>
+                <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={'/tickets'}>Tickets</Link></li>
                 <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' onClick={()=> dispatch(logout())}to={'/login'}>Salir de la sesión</Link></li>
             </ul>
         </nav>

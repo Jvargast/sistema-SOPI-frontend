@@ -17,6 +17,8 @@ const authReducer = (state = { user: {}, loading: true }, action) => {
         isAuthenticated: true,
       };
     case "LOGOUT_SUCCESS":
+      localStorage.removeItem('user');
+      localStorage.removeItem('permissions');
       return {
         ...state,
         user: null,
@@ -25,6 +27,8 @@ const authReducer = (state = { user: {}, loading: true }, action) => {
       }
     case "LOGIN_FAILED":
     case "LOGOUT_FAILED":
+      localStorage.removeItem('user');
+      localStorage.removeItem('permissions');
       return {
         ...state,
         loading: false,
