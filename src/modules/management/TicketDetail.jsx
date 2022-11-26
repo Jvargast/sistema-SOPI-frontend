@@ -42,7 +42,7 @@ export default function TicketDetail() {
             setReloadComment(prev => !prev)
             
         } catch (e) {
-            openMessage('Comentario al agregar comentario', false);
+            openMessage('Error al agregar comentario', false);
 
         }
     }

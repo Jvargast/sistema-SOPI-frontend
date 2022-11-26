@@ -28,7 +28,7 @@ export default function TicketList() {
 
             <PageContentWrapper className={'flex justify-center flex-col items-center'}>
 
-                {tickets.length > 0 ? (
+
                     <>
                         <table className='font-light w-full max-w-[1000px] border border-collapse bg-[#F5F5F5]  border-[#fff]'>
                             <thead className='font-thin'>
@@ -54,13 +54,11 @@ export default function TicketList() {
                                 }
                             </tbody>
                         </table>
-                        <Pagination setData={setTickets} baseUrl={'/api/v1/gestion/ticket'} perPage={3} />
                     </>
-                ) : (
-                    <div className='text-xl'>
-                        No hay tickets disponibles para ver
-                    </div>
-                )}
+               
+    
+                
+                <Pagination visible={tickets.length > 0} setData={setTickets} baseUrl={'/api/v1/gestion/ticket'} perPage={50} />
 
             </PageContentWrapper>
 

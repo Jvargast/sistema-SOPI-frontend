@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import restService from '../utils/restService';
 
-export default function Pagination({ baseUrl, setData, perPage }) {
+export default function Pagination({ baseUrl, setData, perPage, visible }) {
     const [page, setPage] = useState(1);
     const [config, setConfig] = useState({})
     // const [data, setData] = useState([]);
 
     const changePage = (changeValue) => {
+        console.log('Cambiando a pagina ')
+        console.log(config)
         if (page != config.totalPages || changeValue < 0 ) {
 
             setPage(prev => {
@@ -28,7 +30,7 @@ export default function Pagination({ baseUrl, setData, perPage }) {
 
     }, [page]);
     return (
-        <div>
+        <div className={`${visible ? 'visible' : 'invisible'}`}>
 
             <button onClick={() => changePage(-1)}>prev</button>
             <button onClick={() => changePage(1)}>next</button>
