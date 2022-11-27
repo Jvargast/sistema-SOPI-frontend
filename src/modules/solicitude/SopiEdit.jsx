@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../common/Button';
+import { useCheckPermission } from '../common/checkPermissionHook';
 import FieldGroup from '../common/FieldGroup';
 import PageContentWrapper from '../common/PageContentWrapper';
 import SelectInput from '../common/SelectInput';
@@ -21,6 +22,8 @@ export default function SopiEdit() {
         details: []
 
     });
+
+    const hasSolicitudeEditPermission = useCheckPermission('SOPI_EDITAR')
 
     const openMessage = useOpenMessage()
 
@@ -149,7 +152,7 @@ export default function SopiEdit() {
                 <FieldGroup>
 
                     <SelectInput
-                        disabled={!findPermission('SOPI_EDITAR')}
+                        disabled={!hasSolicitudeEditPermission}
                         value={sopi.costCenterId}
                         name={'costCenterId'}
                         label={'Centro de costo'}
@@ -157,7 +160,7 @@ export default function SopiEdit() {
                         options={costCenter}
                     />
                     <SelectInput
-                        disabled={!findPermission('SOPI_EDITAR')}
+                        disabled={!hasSolicitudeEditPermission}
                         value={sopi.financingId}
                         name={'financingId'}
                         label={'Financiamiento'}
@@ -170,7 +173,7 @@ export default function SopiEdit() {
                 <FieldGroup>
                     <SelectInput
                         label={'Estado'}
-                        disabled={!findPermission('SOPI_EDITAR')}
+                        disabled={!hasSolicitudeEditPermission}
                         onChange={handleChange}
                         value={sopi.statusId}
                         name={'statusId'}
@@ -195,7 +198,13 @@ export default function SopiEdit() {
                     </div>
                 </div>
                 <div className='flex'>
-                    <div className='mr-6'><Button onClick={sendSopi}>Guardar</Button></div>
+
+                    {
+                        hasSolicitudeEditPermission ? (
+
+                            <div className='mr-6'><Button onClick={sendSopi}>Guardar</Button></div>
+                        ) :' '
+                    }
                     {
                         findPermission('COMPRA_CREAR') ?
                             <div className='mr-6'><Button onClick={createPurchase}>Crear proceso de compra</Button></div> : ''

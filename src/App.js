@@ -56,7 +56,7 @@ function App() {
               <Route path=":ticketId" element={<TicketDetail/>}/>
 
             </Route>
-            <Route path="/usuarios">
+            <Route path="/usuarios" element={<PrivateRoute/>}>
               <Route path="perfil/:userId" element={<UserProfile/>}/>
               <Route path="perfil" element={<UserProfile/>}/>
               <Route path="" element={<UserList/>}/>

@@ -1,7 +1,7 @@
 import { Formik, useFormik } from 'formik';
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../common/Button';
 import CheckBox from '../common/CheckBox';
 import FieldGroup from '../common/FieldGroup';
@@ -24,63 +24,146 @@ export default function UserProfile() {
     },
     onSubmit: async (values) => {
       try {
-        const res = await restService.put(`/api/v1/auth/usuarios/${userId || userData.user.id}`, values )
+        const res = await restService.put(`/api/v1/auth/usuarios/${userId || userData.user.id}`, values)
         openMessage('Usuario editado con éxito', true)
       } catch (e) {
         openMessage('Error al editar usuario', false)
       }
+    },
+    validate: (values) => {
+      let errors = null;
+      console.log(values.password, values.confirmPassword)
+      if (values.password != values.confirmPassword) {
+        errors = {}
+        errors.confirmPassword = 'Las contraseñas no coinciden'
+      }
+      if (errors && submit) {
+        openMessage('Revisa los datos del formulario', false);
+
+      }
+
+      return errors;
     }
   })
 
-  const { userId } = useParams() 
+  const { userId } = useParams()
+
+  const navigate = useNavigate()
+
+  const [submit, setSubmit] = useState(false)
 
   const userData = useSelector(store => store.authReducer);
-  const [permissions, setPermissions] = useState([]);
-  const [user, setUser] = useState();
+  const [availablePermissions, setAvailablePermissions] = useState([]);
+  const [currentProfilePermissions, setCurrentProfilePermissions] = useState([]);
+  const [userPermissions, setUserPermissions] = useState([]);
+  const [appPermissions, setAppPermissions] = useState([]);
+
+  const [user, setUser] = useState({});
+
+
 
   const openMessage = useOpenMessage()
+
+
   useEffect(() => {
 
-    const searchUserAccesses = async () => {
-      const res = await restService.post(`/api/v1/auth/usuarios/${userId || userData.user.id}/accesos`)
 
-      setPermissions(res.data.data)
-      
+    const calculatePermissions = async () => {
+      let res = await restService.get(`/api/v1/auth/perfiles/${user.profile.id}`);
+      const pp = res.data.data.permisos;
+      setCurrentProfilePermissions(pp);
+
+      res = await restService.get(`/api/v1/auth/usuarios/${userId || userData.user.id}/accesos`)
+      const up = res.data.data;
+      setUserPermissions(up);
+      console.log('User permissions ', up)
+
+      res = await restService.get(`/api/v1/auth/permisos`);
+      const ap = res.data.data;
+      setAppPermissions(ap);
+
+      setAvailablePermissions((prev) => {
+        const tempPermissions = ap.filter((p) => {
+          return pp.find(pp => pp.permisoId == p.id) == null
+        });
+
+        return tempPermissions.map(p => {
+          return {
+            ...p,
+            checked: (up.find(upp => {
+              return upp.permissionId == p.id
+            }) != null)
+          }
+        })
+      });
     }
-    
+
+    if (userData && userData.permissions && userData.permissions.find(p => p.name == 'USUARIO_EDITAR')) {
+      console.log('Calculando permisos', setCurrentProfilePermissions.length, userPermissions.length, appPermissions.length)
+      calculatePermissions()
+    }
+  }, [userData.permissions, userData, user])
+
+  useEffect(() => {
+
+
     const searchUser = async () => {
-      const res = await restService.get(`/api/v1/auth/usuarios/${userId || userData.user.id}`)
-      const userRequest = res.data.data
-      delete userRequest.password
-      userForm.setValues(userRequest)
+      try {
+        
+        const res = await restService.get(`/api/v1/auth/usuarios/${userId || userData.user.id}`)
+        const userRequest = res.data.data
+        delete userRequest.password
+        setUser(userRequest)
+        userForm.setValues(values => {
+          console.log('valus', values)
+          return {
+            ...values,
+            ...userRequest
+          }
+        })
+        
+        
+      } catch (e) {
+        openMessage('Error al buscar usuario', false)
+        navigate('/home')
+      }
     }
-    try {
-      searchUser()
-      searchUserAccesses()
-     
-
-    } catch (e) {
-      openMessage('Error al buscar usuario', false)
-    }
+    searchUser()
 
   }, [userId])
 
   const handleChange = (name, value) => {
-    setPermissions(prev => {
+    setAvailablePermissions(prev => {
       return {
         ...prev,
         [name]: value
       }
     })
   }
-  const handleSubmitPermissions = () => {
-    console.log(permissions)
+  const handleSubmitPermissions = async () => {
+
+  let newAccesses = availablePermissions.filter(p => p.checked)
+
+  newAccesses = newAccesses.map( p => {
+      if (p.checked) {
+        return {
+          id: p.id
+        }
+      }
+    })
+    console.log(newAccesses)
+    try {
+      const res = await restService.put(`/api/v1/auth/usuarios/${user.id}/accesos`, {newAccesses})
+      openMessage('Permisos actualizados con éxito', true)
+    } catch (e) {
+      openMessage('Error al actualizar permisos', false)
+    }
   }
 
 
   return (
     <div className='m-10'>
-      <Title title={'Usuario: '} />
+      <Title title={`Usuario:   ${userForm.values.firstname}  ${userForm.values.lastname}`} />
       <PageContentWrapper>
 
         <FieldGroup>
@@ -118,7 +201,10 @@ export default function UserProfile() {
 
           />
         </FieldGroup>
-        <Button onClick={userForm.handleSubmit}>Guardar</Button>
+        <Button onClick={() => {
+          setSubmit(true);
+          userForm.handleSubmit();
+        }}>Guardar</Button>
         {
           userData.permissions ? (
             userData.permissions.find(p => p.name == 'USUARIO_EDITAR') != null ? (
@@ -126,9 +212,13 @@ export default function UserProfile() {
               <>
                 <p className='text-xl mb-8'>Editor de permisos</p>
                 {
-                  permissions.map(p => <CheckBox handleChange={handleChange} label={p.name} id={p.id} value={permissions[p.id]} />)
+                  availablePermissions.map(p => {
+                    return (<CheckBox check={p.checked} handleChange={() => {
+                      p.checked = !p.checked
+                    }} label={p.name} id={p.id} value={availablePermissions[p.id]} />)
+                  })
                 }
-  
+
                 <Button onClick={handleSubmitPermissions}>Guardar Permisos</Button>
               </>
             ) : ''

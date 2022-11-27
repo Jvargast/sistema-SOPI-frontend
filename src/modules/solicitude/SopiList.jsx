@@ -5,23 +5,26 @@ import restService from '../utils/restService';
 import editButton from "../../assets/edit-button.svg";
 import Title from '../common/Title';
 import { useOpenMessage } from '../common/UserMessage';
+import { useCheckPermission } from '../common/checkPermissionHook';
 
 export default function SopiList() {
 
     const [sopis, setSopis] = useState([]);
 
-    const openMessage = useOpenMessage()
+    const openMessage = useOpenMessage();
+
+    const hasSolicitudeAddPermission = useCheckPermission('SOPI_CREAR');
 
     useEffect(() => {
         const searchSopis = async () => {
             try {
                 const res = await restService.get('/api/v1/sopi')
-                if (res.status == 403 ) {
+                if (res.status == 403) {
                     openMessage('No tienes el acceso necesario para ver las solicitudes', false);
-                    
+
                 }
                 setSopis(res.data.data)
-                
+
             } catch (e) {
                 openMessage('No tienes el acceso necesario para ver las solicitudes', false);
                 navigate('/home')
@@ -66,10 +69,14 @@ export default function SopiList() {
                 </table>
             </div>
 
-            <div className='flex justify-center mt-8'>
+            {
+                hasSolicitudeAddPermission ? (
+                    <div className='flex justify-center mt-8'>
 
-                <Button onClick={() => navigate('/sopis/nueva')}>Agregar solicitud</Button>
-            </div>
+                        <Button onClick={() => navigate('/sopis/nueva')}>Agregar solicitud</Button>
+                    </div>
+                ) : ''
+            }
 
 
         </div>

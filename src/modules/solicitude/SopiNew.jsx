@@ -7,6 +7,7 @@ import { useOpenMessage } from "../common/UserMessage";
 import Title from '../common/Title';
 import restService from '../utils/restService';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 
 export default function SopiNew() {
 
@@ -16,6 +17,8 @@ export default function SopiNew() {
     const [selectedSupply, setSelectedSupply] = useState();
 
     const openMessage = useOpenMessage();
+
+    const navigate = useNavigate()
 
     const formik = useFormik({
         initialValues: {
@@ -53,6 +56,7 @@ export default function SopiNew() {
             const res = await restService.post('/api/v1/sopi', body);
             if (res.status == 200) {
                 openMessage('Solicitud ingresada con éxito', true);
+                navigate('/sopis')
             } else {
 
                 openMessage('Error al ingresar solicitud', false);

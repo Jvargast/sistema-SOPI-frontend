@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function CheckBox({id, handleChange, value, name, label, check}) {
 
-    const [checked, setChecked] = useState(check || true);
+    const [checked, setChecked] = useState(check);
+
+    useEffect(() => {
+        console.log('Checkbox ', checked)
+    }, []);
 
     const toggleCheckBox = () => {
         setChecked( prev => {

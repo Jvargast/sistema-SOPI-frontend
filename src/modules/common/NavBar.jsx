@@ -2,13 +2,15 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { logout } from '../../contexts/actions';
-import { checkAnyPermission, useCheckAnyPermission } from './checkPermissionHook';
+import { checkAnyPermission, useCheckAnyPermission, useCheckPermission } from './checkPermissionHook';
 
 export default function NavBar() {
     const dispatch = useDispatch();
 
     const userData = useSelector(store => store.authReducer)
-    const hasViewSopiModulePermission = useCheckAnyPermission(['SOPI_VER', 'SOPI_VER_CREADA'])
+    const hasViewSopiModulePermission = useCheckAnyPermission(['SOPI_VER', 'SOPI_VER_CREADA']);
+
+    const hasUserViewPermission = useCheckPermission('USUARIO_VER')
     return (
         <nav className=' bg-[#F3931D]   '>
             <ul className='flex justify-center h-[50px] items-center list-none w-full h-full'>
@@ -19,7 +21,9 @@ export default function NavBar() {
                 }
                 <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={'/compras'}>Compras</Link></li>
                 <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={'/tickets'}>Tickets</Link></li>
-                <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={'/usuarios'}>Usuarios</Link></li>
+                {
+                    hasUserViewPermission ? <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={'/usuarios'}>Usuarios</Link></li> :''
+                }
                 {
                     userData.user ?
                     <li className='text-xl h-full mx-8 flex items-stretch'><Link className='h-full flex items-center text-white' to={`/usuarios/perfil/${userData.user.id}`}>Mi perfil</Link></li>

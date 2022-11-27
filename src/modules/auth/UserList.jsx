@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PageContentWrapper from '../common/PageContentWrapper';
 import Title from '../common/Title';
 import { useOpenMessage } from '../common/UserMessage';
@@ -11,17 +11,21 @@ export default function UserList() {
 
     const openMessage = useOpenMessage()
 
+    const navigate = useNavigate()
+
     useEffect(() => {
 
         const searchUsers = async () => {
-            const res = await restService.get('/api/v1/auth/usuarios')
-            setUsers(res.data.data)
+            try {
+                const res = await restService.get('/api/v1/auth/usuarios')
+                setUsers(res.data.data)
+            } catch (e) {
+                openMessage('Error al buscar usuarios', false);
+                navigate('/home')
+            }
+            
         }
-        try {
-            searchUsers()
-        } catch (e) {
-            openMessage('Error al buscar usuarios', false)
-        }
+        searchUsers()
     }, [])
 
 

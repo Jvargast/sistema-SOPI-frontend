@@ -8,8 +8,10 @@ export const useCheckPermission = (permission) => {
     const user = useSelector(store => store.authReducer);
 
     useEffect(() => {
-        setHasPermission(user.permissions.find(p => p.name == permission));
-    }, [user])
+        if (user && user.permissions) {
+            setHasPermission(user.permissions.find(p => p.name == permission));
+        }
+    }, [user, user.permissions])
 
     return hasPermission;
 
