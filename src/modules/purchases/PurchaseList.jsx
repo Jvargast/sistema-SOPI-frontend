@@ -13,7 +13,7 @@ export default function PurchaseList() {
         const searchPurchases = async () => {
             const res = await restService.get('/api/v1/compras')
             console.log(res.data.data)
-            setPurchases(res.data.data)
+            setPurchases(res.data.data.data)
         }
         searchPurchases()
     }, [])

@@ -26,21 +26,34 @@ export default function UserProfile() {
       try {
         const res = await restService.put(`/api/v1/auth/usuarios/${userId || userData.user.id}`, values)
         openMessage('Usuario editado con éxito', true)
+        setSubmit(false);
       } catch (e) {
         openMessage('Error al editar usuario', false)
+        setSubmit(false);
       }
     },
     validate: (values) => {
       let errors = null;
       console.log(values.password, values.confirmPassword)
-      if (values.password != values.confirmPassword) {
+      if (values.password.length > 0 && values.password.length < 6) {
         errors = {}
+        errors.password = 'La contraseña debe tener más de 6 carácteres'
+      }
+      if (values.password != values.confirmPassword) {
+        if (!errors) {
+
+          errors = {}
+        }
         errors.confirmPassword = 'Las contraseñas no coinciden'
       }
-      if (errors && submit) {
-        openMessage('Revisa los datos del formulario', false);
+      if (values.username <6) {
+        if (!errors) {
 
+          errors = {}
+        }
+        errors.username = 'El nombre de usuario debe tener mínimo 6 carácteres'
       }
+
 
       return errors;
     }
@@ -169,33 +182,39 @@ export default function UserProfile() {
         <FieldGroup>
           <FormField
             {...userForm.getFieldProps('username')}
+            error={userForm.touched.username ? userForm.errors.username : ''}
             label={'Nombre de usuario'}
-          />
+            />
           <FormField
             {...userForm.getFieldProps('password')}
             label={'Contraseña'}
-          />
+            error={userForm.touched.password ? userForm.errors.password : ''}
+            />
           <FormField
             {...userForm.getFieldProps('confirmPassword')}
+            error={userForm.touched.confirmPassword ? userForm.errors.confirmPassword : ''}
             label={'Confirmación de contraseña'}
-          />
+            />
         </FieldGroup>
 
         <FieldGroup>
           <FormField
             {...userForm.getFieldProps('firstname')}
+            error={userForm.touched.firstname ? userForm.errors.firstname : ''}
             label={'Nombre'}
-
-          />
+            
+            />
           <FormField
             {...userForm.getFieldProps('lastname')}
+            error={userForm.touched.lastname ? userForm.errors.lastname : ''}
             label={'Apellido'}
-
-          />
+            
+            />
         </FieldGroup>
         <FieldGroup>
 
           <FormField
+            error={userForm.touched.mail? userForm.errors.mail : ''}
             {...userForm.getFieldProps('mail')}
             label={'Mail'}
 
@@ -204,6 +223,8 @@ export default function UserProfile() {
         <Button onClick={() => {
           setSubmit(true);
           userForm.handleSubmit();
+          
+
         }}>Guardar</Button>
         {
           userData.permissions ? (

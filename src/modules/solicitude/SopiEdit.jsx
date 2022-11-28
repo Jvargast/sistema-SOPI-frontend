@@ -40,10 +40,12 @@ export default function SopiEdit() {
             const res = await restService.post('/api/v1/compras', { sopiId: sopi.sopiId, creationType: 'SOPI_COMPLETA' });
             console.log(res)
             if (res.status == 200) {
+                openMessage('Compra creada con éxito', true);
                 navigate('/compras')
             }
-
+            
         } catch (e) {
+            openMessage('Error al crear compra', true);
             console.log(e)
         }
     }

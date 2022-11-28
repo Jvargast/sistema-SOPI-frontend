@@ -23,7 +23,7 @@ export default function SopiList() {
                     openMessage('No tienes el acceso necesario para ver las solicitudes', false);
 
                 }
-                setSopis(res.data.data)
+                setSopis(res.data.data.data)
 
             } catch (e) {
                 openMessage('No tienes el acceso necesario para ver las solicitudes', false);
