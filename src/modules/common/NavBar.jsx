@@ -8,7 +8,7 @@ export default function NavBar() {
     const dispatch = useDispatch();
 
     const userData = useSelector(store => store.authReducer)
-    const hasViewSopiModulePermission = useCheckAnyPermission(['SOPI_VER', 'SOPI_VER_CREADA']);
+    const hasViewSopiModulePermission = useCheckAnyPermission(['SOPI_VER', 'SOPI_VER_CREADAS']);
 
     const hasUserViewPermission = useCheckPermission('USUARIO_VER')
     return (

@@ -9,19 +9,22 @@ export default function Pagination({ baseUrl, setData, perPage, visible }) {
     const changePage = (changeValue) => {
         console.log('Cambiando a pagina ')
         console.log(config)
-        if (page != config.totalPages || changeValue < 0 ) {
+        if (page != config.totalPages || changeValue < 0) {
 
-            setPage(prev => {
-                const a = (prev + changeValue) <= 0 ? 1 : (prev + changeValue)
-                console.log(a)
-                return a;
-            })
         }
+        setPage(prev => {
+            const a = (prev + changeValue) <= 0 ? 1 : (prev + changeValue)
+            console.log(a)
+            return a;
+        })
     }
 
     useEffect(() => {
         const searchData = async () => {
             const res = await restService.get(`${baseUrl.includes('?') ? `${baseUrl}&per_page=${perPage}&page=${page}` : `${baseUrl}?per_page=${perPage}&page=${page}`}`)
+            if (res.data.data.data.length == 0) {
+                changePage(-1)
+            }
             setData(res.data.data.data)
             setConfig(res.data.data.pagination)
             console.log('Data lenght ', res.data.data.data.length)

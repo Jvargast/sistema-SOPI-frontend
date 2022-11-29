@@ -1,6 +1,6 @@
 import { useFormik } from 'formik'
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import FieldGroup from '../common/FieldGroup'
 import FormField from '../common/FormField'
 import PageContentWrapper from '../common/PageContentWrapper'
@@ -17,6 +17,8 @@ export default function TicketDetail() {
     const [commentResponse, setCommentResponse] = useState('');
 
     const [reloadComment, setReloadComment] = useState(false)
+
+    const navigate = useNavigate()
 
     const [ticket, setTicket] = useState({
         comments: []
@@ -72,6 +74,7 @@ export default function TicketDetail() {
     return (
         <div className='m-10'>
             <Title title={'Información del ticket'} />
+            <Button onClick={() => navigate(`/compras/${ticket.purchaseId}`)}>Ir a compra asociada</Button>
             <PageContentWrapper>
 
                 <FieldGroup>

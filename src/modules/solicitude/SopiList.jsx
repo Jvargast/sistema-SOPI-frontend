@@ -4,6 +4,7 @@ import Button from '../common/Button';
 import restService from '../utils/restService';
 import editButton from "../../assets/edit-button.svg";
 import Title from '../common/Title';
+import Pagination from '../common/Pagination';
 import { useOpenMessage } from '../common/UserMessage';
 import { useCheckPermission } from '../common/checkPermissionHook';
 
@@ -18,12 +19,12 @@ export default function SopiList() {
     useEffect(() => {
         const searchSopis = async () => {
             try {
-                const res = await restService.get('/api/v1/sopi')
-                if (res.status == 403) {
-                    openMessage('No tienes el acceso necesario para ver las solicitudes', false);
+                // const res = await restService.get('/api/v1/sopi')
+                // if (res.status == 403) {
+                //     openMessage('No tienes el acceso necesario para ver las solicitudes', false);
 
-                }
-                setSopis(res.data.data.data)
+                // }
+                // setSopis(res.data.data.data)
 
             } catch (e) {
                 openMessage('No tienes el acceso necesario para ver las solicitudes', false);
@@ -39,7 +40,7 @@ export default function SopiList() {
         <div className='m-10'>
             <Title title={'Solicitudes'} />
 
-            <div className='w-full flex justify-center mt-10'>
+            <div className='w-full flex flex-col items-center justify-center mt-10'>
                 <table className='font-light w-full max-w-[1000px] border border-collapse bg-[#F5F5F5]  border-[#fff]'>
                     <thead className='font-thin'>
                         <tr className='text-lg '>
@@ -67,6 +68,11 @@ export default function SopiList() {
                         }
                     </tbody>
                 </table>
+                <Pagination
+                visible={true}
+                    perPage={2}
+                    baseUrl={'/api/v1/sopi'}
+                    setData={setSopis} />
             </div>
 
             {
